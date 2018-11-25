@@ -1,7 +1,16 @@
 // JavaScript source code block_controller.js used to create BlockController class
 
 const BlockClass = require('./block.js');
-const BlockChain = require('./blockchain.js')
+const BlockChain = require('./blockchain.js');
+const MemPool = require('./mempool.js');
+
+const bitcoin = require('bitcoinjs-lib');
+const bitcoinMessage = require('bitcoinjs-message');
+
+let address = '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ'
+let signature = 'IJtpSFiOJrw/xYeucFxsHvIRFJ85YSGP8S1AEZxM4/obS3xr9iz7H0ffD7aM2vugrRaCi/zxaPtkflNzt5ykbc0='
+let message = '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ:1532330740:starRegistry'
+
 
 
 /********************************************************************
@@ -18,8 +27,31 @@ class BlockController {
     constructor(app) {
         this.app = app;
         this.blockChain = new BlockChain.Blockchain();
+        this.memPool = new MemPool.memPool();
         this.getBlockByIndex();
         this.postNewBlock();
+        this.requestValidation();
+    }
+
+    /*************************************************************************************
+     * Implement a GET Endpoint to retrieve a block by index, url: "/api/block/:index"
+     *************************************************************************************/
+
+    requestValidation() {
+        console.log("in requestValidation ");
+        this.app.post("/requestValidation", (req, res) => {
+            console.log("in requestValidation ");
+            // Listen for height param and convert to integer if necessary
+            console.log("in requestValidation req.body is: " + JSON.stringify(req.body));
+            if (req.body) {
+                let validationRequestObject = this.memPool.addARequestValidation(req.body)
+                return res.status(200).json(validationRequestObject);
+            }
+            
+           
+            // start error checking if ok send back requested block in json format
+
+        })
     }
 
     /*************************************************************************************
@@ -50,10 +82,11 @@ class BlockController {
             }).catch((error) => { return res.status(500).send("Something went wrong! " + error); })
         })
     }
-
+    
     /**********************************************************************
     * Implement a POST Endpoint to add a new Block, url: "/api/block"
     ***********************************************************************/
+
 
     postNewBlock() {
         this.app.post("/block/:data?", (req, res) => {
@@ -76,6 +109,8 @@ class BlockController {
         });
     }
 }
+
+console.log("bitcoinmessage.verify is: " + bitcoinMessage.verify(message, address, signature));
 
 /**************************************************************
  * Exporting the BlockController class

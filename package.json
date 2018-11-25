@@ -1,13 +1,13 @@
 {
-  "name": "rest_api_exp",
+  "name": "blockchain_notary_service",
   "version": "1.0.0",
-  "description": "In this exercise you will practice a creation of a web service that respond with the block hash.",
+  "description": "Build a Star Registry Service that allows users to claim ownership of their favorite star in the night sky.",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Bob Ingram",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.3",
     "crypto-js": "^3.1.9-1",
@@ -20,10 +20,10 @@
   "devDependencies": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/paramountgroup/RESTful-API-with-Nodejs.git"
+    "url": "git+https://github.com/paramountgroup/Private-Blockchain-Notary-Service.git"
   },
   "bugs": {
-    "url": "https://github.com/paramountgroup/RESTful-API-with-Nodejs/issues"
+    "url": "https://github.com/paramountgroup/Private-Blockchain-Notary-Service/issues"
   },
-  "homepage": "https://github.com/paramountgroup/RESTful-API-with-Nodejs#readme"
+  "homepage": "https://github.com/paramountgroup/Private-Blockchain-Notary-Service#readme"
 }
