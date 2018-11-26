@@ -11,6 +11,7 @@ class requestObject {
         this.requestTimeStamp = (new Date().getTime().toString().slice(0, -3));
         this.message = "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry";
         this.validationWindow = 300;
+        this.timeout = ""
     }
 }
 

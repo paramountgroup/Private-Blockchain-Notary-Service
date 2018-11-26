@@ -44,8 +44,9 @@ class BlockController {
             // Listen for height param and convert to integer if necessary
             console.log("in requestValidation req.body is: " + JSON.stringify(req.body));
             if (req.body) {
-                let validationRequestObject = this.memPool.addARequestValidation(req.body)
-                return res.status(200).json(validationRequestObject);
+                let returnValidationObject = this.memPool.addARequestValidation(req.body)
+                delete returnValidationObject.timeout;
+                return res.status(200).json(returnValidationObject);
             }
             
            
