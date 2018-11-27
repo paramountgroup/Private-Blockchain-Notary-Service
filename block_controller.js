@@ -31,27 +31,44 @@ class BlockController {
         this.getBlockByIndex();
         this.postNewBlock();
         this.requestValidation();
+        this.requestToValidate();
     }
 
     /*************************************************************************************
      * Implement a GET Endpoint to retrieve a block by index, url: "/api/block/:index"
      *************************************************************************************/
-
+    
     requestValidation() {
         console.log("in requestValidation ");
         this.app.post("/requestValidation", (req, res) => {
             console.log("in requestValidation ");
             // Listen for height param and convert to integer if necessary
             console.log("in requestValidation req.body is: " + JSON.stringify(req.body));
-            if (req.body) {
+            if (req.body.address) {
                 let returnValidationObject = this.memPool.addARequestValidation(req.body)
                 delete returnValidationObject.timeout;
                 return res.status(200).json(returnValidationObject);
+            } else {
+                return res.status(404).send("no address to validate");
             }
-            
-           
-            // start error checking if ok send back requested block in json format
+        })
+    }
 
+
+
+    requestToValidate() {
+        console.log("in requestToValidate ");
+        this.app.post("/message-signature/validate", (req, res) => {
+           // console.log("in requestToValidate ");
+            
+            console.log("in requestToValidate req.body is: " + JSON.stringify(req.body));
+            if (req.body.address && req.body.signature) {
+                let validationResultArray = this.memPool.validateRequestByWallet(req.body)
+              
+                return res.status(validationResultArray[0]).json(validationResultArray[1]);
+            } else {
+                return res.status(404).send("Missing address or signature to validate");
+            }
         })
     }
 
