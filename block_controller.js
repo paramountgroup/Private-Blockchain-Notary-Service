@@ -1,6 +1,7 @@
 // JavaScript source code block_controller.js used to create BlockController class
 
 const BlockClass = require('./block.js');
+const StarBlockClass = require('./star_block.js');
 const BlockChain = require('./blockchain.js');
 const MemPool = require('./mempool.js');
 
@@ -116,7 +117,9 @@ class BlockController {
                 console.log("in postNewStar starting verifyAddressRequest");
                 let validAddressRequestArray = this.memPool.verifyAddressRequest(req.body)
                 if (validAddressRequestArray[2]) {
-                    let newBlock = new BlockClass.Block(req.body);
+                    console.log("in postNewStar and req.body.star.story is: " + req.body.star.story);
+                    let starStoryHexEncode = new Buffer(req.body.star.story).toString('hex');
+                    let newBlock = new StarBlockClass.StarBlock(req.body.address, req.body.star.ra, req.body.star.dec, req.body.star.mag, req.body.star.cen, starStoryHexEncode);
                     // add block and check for errors
                     this.blockChain.addBlock(newBlock).then((addedBlock) => {
                         if (addedBlock) {// success return block that was added
