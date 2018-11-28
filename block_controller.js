@@ -4,7 +4,7 @@ const BlockClass = require('./block.js');
 const StarBlockClass = require('./star_block.js');
 const BlockChain = require('./blockchain.js');
 const MemPool = require('./mempool.js');
-
+const hex2ascii = require('hex2ascii')
 const bitcoin = require('bitcoinjs-lib');
 const bitcoinMessage = require('bitcoinjs-message');
 
@@ -119,10 +119,12 @@ class BlockController {
                 if (validAddressRequestArray[2]) {
                     console.log("in postNewStar and req.body.star.story is: " + req.body.star.story);
                     let starStoryHexEncode = new Buffer(req.body.star.story).toString('hex');
-                    let newBlock = new StarBlockClass.StarBlock(req.body.address, req.body.star.ra, req.body.star.dec, req.body.star.mag, req.body.star.cen, starStoryHexEncode);
+                    let star = new StarBlockClass.StarBlock(req.body.address, req.body.star.ra, req.body.star.dec, req.body.star.mag, req.body.star.cen, starStoryHexEncode);
+                    let newBlock = new BlockClass.Block(star);
                     // add block and check for errors
                     this.blockChain.addBlock(newBlock).then((addedBlock) => {
                         if (addedBlock) {// success return block that was added
+                            addedBlock.body.star.story = hex2ascii(addedBlock.body.star.story);
                             return res.status(201).json(addedBlock);
                         } else {
                             return res.status(500).send("Something went wrong star block was NOT added");
