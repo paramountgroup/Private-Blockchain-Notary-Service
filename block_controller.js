@@ -29,9 +29,10 @@ class BlockController {
         this.blockChain = new BlockChain.Blockchain();
         this.memPool = new MemPool.memPool();
         this.getBlockByIndex();
-        this.postNewBlock();
+        this.postNewStar();
         this.requestValidation();
-        this.requestToValidate();
+        this.validateSignature();
+        this.postNewStar();
     }
 
     /*************************************************************************************
@@ -56,16 +57,17 @@ class BlockController {
 
 
 
-    requestToValidate() {
+
+    validateSignature() {
         console.log("in requestToValidate ");
         this.app.post("/message-signature/validate", (req, res) => {
-           // console.log("in requestToValidate ");
-            
+            // console.log("in requestToValidate ");
+
             console.log("in requestToValidate req.body is: " + JSON.stringify(req.body));
             if (req.body.address && req.body.signature) {
-                let validationResultArray = this.memPool.validateRequestByWallet(req.body)
-              
-                return res.status(validationResultArray[0]).json(validationResultArray[1]);
+                let validRequestArray = this.memPool.validateRequestByWallet(req.body)
+
+                return res.status(validRequestArray[0]).json(validRequestArray[1]);
             } else {
                 return res.status(404).send("Missing address or signature to validate");
             }
@@ -106,29 +108,35 @@ class BlockController {
     ***********************************************************************/
 
 
-    postNewBlock() {
-        this.app.post("/block/:data?", (req, res) => {
+    postNewStar() {
+        this.app.post("/block", (req, res) => {
             // retrieve data and create new block
-            if (req.params.data) {
-                let newBlock = new BlockClass.Block(req.params.data);
-                // add block and check for errors
-                this.blockChain.addBlock(newBlock).then((addedBlock) => {
-                    if (addedBlock) {// success return block that was added
-                        return res.status(201).json(addedBlock);
-                    } else {
-                        return res.status(500).send("Something went wrong block was NOT added");
-                    }
-                }).catch((error) => {//catch error if something went wrong with promises
-                    return res.status(500).send("Something went wrong! " + error);
-                })
-            } else {// data param was empty
-                res.status(403).send("Forbidden to persist block without content");
+           
+            if (req.body) {
+                console.log("in postNewStar starting verifyAddressRequest");
+                let validAddressRequestArray = this.memPool.verifyAddressRequest(req.body)
+                if (validAddressRequestArray[2]) {
+                    let newBlock = new BlockClass.Block(req.body);
+                    // add block and check for errors
+                    this.blockChain.addBlock(newBlock).then((addedBlock) => {
+                        if (addedBlock) {// success return block that was added
+                            return res.status(201).json(addedBlock);
+                        } else {
+                            return res.status(500).send("Something went wrong star block was NOT added");
+                        }
+                    }).catch((error) => {//catch error if something went wrong with promises
+                        return res.status(500).send("Something went wrong! " + error);
+                    })
+                } else {
+                    return res.status(validAddressRequestArray[0]).json(validAddressRequestArray[1])
+                }
+            } else {
+                res.status(400).send("No star registration data in request")
             }
         });
     }
 }
 
-console.log("bitcoinmessage.verify is: " + bitcoinMessage.verify(message, address, signature));
 
 /**************************************************************
  * Exporting the BlockController class

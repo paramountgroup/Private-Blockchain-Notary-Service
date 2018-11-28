@@ -59,8 +59,8 @@ class memPool {
         const message = "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry"
         console.log(" in validateRequestByWallet validateRequest.address is: " + validateRequest.address);
         console.log(" in validateRequestByWallet this.mempool[0].walletAddress is: " + this.mempool[0].walletAddress);
-        let key = "walletAddress"
-        let index = mempoolUtil.findObjectByKey(this.mempool, key, validateRequest.address)
+      //  let key = "walletAddress"
+        let index = mempoolUtil.findObjectByKey(this.mempool, "walletAddress", validateRequest.address)
         console.log("in validateRequestByWallet and mempool index of request is: " + index);
         
         
@@ -74,11 +74,12 @@ class memPool {
         console.log("in validateRequestByWallet and validateRequest.signature is: " + validateRequest.signature);
 
         if (bitcoinMessage.verify(this.mempool[index].message, this.mempool[index].walletAddress, validateRequest.signature)) {
-            let timestamp = new Date().getTime().toString().slice(0, -3);
+           // let timestamp = new Date().getTime().toString().slice(0, -3);
             let mempoolValidRequestObject = new MempoolValidObjectClass.MempoolValidObject(validateRequest.address);
             mempoolValidRequestObject.status.validationWindow = mempoolUtil.findTimeLeftInMempool(this.mempool[index], TimeoutRequestsWindowTime);
-            this.removeValidationRequest(validateRequest.address);
+            this.removeValidationRequest(validateRequest.address, this.mempool);
             this.mempoolValid.push(mempoolValidRequestObject);
+            
             return [200, mempoolValidRequestObject];
         } else {
             return [404, "Signature did not verify"];
@@ -89,35 +90,35 @@ class memPool {
 
         
         let self = this;
-        validationRequestObject.timeout = setTimeout(function () { self.removeValidationRequest(validationRequestObject.walletAddress) }, TimeoutRequestsWindowTime);
+        validationRequestObject.timeout = setTimeout(function () { self.removeValidationRequest(validationRequestObject.walletAddress, self.mempool) }, TimeoutRequestsWindowTime);
         console.log("in addToMemPool and validationRequestObject is: " + validationRequestObject);
         this.mempool.push(validationRequestObject);
     }
 
-    removeValidationRequest(walletAddress) {
+    removeValidationRequest(walletAddress, array) {
         console.log("in removeValidationRequest walletAddress is: " + walletAddress);
-        this.mempool.splice(mempoolUtil.findObjectByKey(this.mempool, "walletAddress", walletAddress), 1);
+        array.splice(mempoolUtil.findObjectByKey(this.mempool, "walletAddress", "", walletAddress), 1);
         console.log(" in removeValidationRequest just removed an object that timed out mempool is: " + this.mempool);
         //this.mempool.splice(this.mempool.walletAddress.indexOf(walletAddress), 1);
 
     }
 
-    /*
-    findObjectByKey(array, key, value) {
-        console.log("in findObjectByKey value is: " + value);
-        for (var i = 0; i < array.length; i++) {
-            console.log("in findObjectByKey for loop and i is: " + i);
-            if (array[i][key] === value) {
-                console.log("in findObjectByKey returning array position i: " + i);
-                return i;
-            }
+    verifyAddressRequest(body) {
+        console.log("in verifyAddressRequest this.mempoolValid[0].status.address: " + this.mempoolValid[0].status.address);
+        let index = mempoolUtil.findObjectByKey(this.mempoolValid, "status", "address", body.address);
+        console.log(" in verifyAddressRequest index is: " + index);
+        console.log(" in verifyAddressRequest this.mempoolValid is: " + JSON.stringify(this.mempoolValid));
+        if (index === null) {
+            // console.log(" in validateRequestByWallet and !index is: " + (!index));
+            return [404, "Valid star registry request not found or exceeds 5 minute request window", false];
+        } else if (body.star.ra && body.star.dec && body.star.story) {
+            this.removeValidationRequest(body.address, this.mempoolValid)
+            return [200, "Valid star registry request add to blockchain", true];
+        } else {
+            return [400, "Star registry request missing coordinates or story", false]
         }
-        //did not find the requested address the mempool - return null
-        return null;
+
     }
-
-*/
-
 }
 
 module.exports.memPool = memPool;
