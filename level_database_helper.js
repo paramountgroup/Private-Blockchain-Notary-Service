@@ -1,6 +1,8 @@
 // JavaScript source code level_database_helper.js
 
 const level = require('level');
+const hex2ascii = require('hex2ascii');
+
 const chaindb = './chaindata';
 
 /***********************************************************************************************
@@ -27,6 +29,70 @@ class LevelDatabase {
                     resolve(JSON.parse(value));
                 }
             });
+        });
+    }
+
+
+    /*============================================================================================
+    * getLevelDBDataByHash returns the requested block object using hash as the key for lookup
+    =============================================================================================*/
+    
+    getLevelDBDataByHash(hashValue) {
+        let self = this.db;
+        let block = null;
+        console.log("in getLevelDBDataByHash passed in hash is: " + hashValue);
+        console.log("in getLevelDBByHash and this.db is: " + JSON.stringify(this.db));
+        return new Promise(function (resolve, reject) {
+            self.createReadStream()
+                .on('data', function (data) {
+                    console.log("in getLevelDBDataByHash reading stream JSON.parse(data.value).hash is: " + JSON.parse(data.value).hash);
+                    console.log("in getLevelDBDataByHash reading stream data is: " + data);
+                    console.log("in getLevelDBDataByHash reading stream JSON.stringify(data) is: " + JSON.stringify(data));
+                    if (JSON.parse(data.value).hash === hashValue) {
+                        block = JSON.parse(data.value);
+                        
+                    }
+                })
+                .on('error', function (err) {
+                    reject(err)
+                })
+                .on('close', function () {
+                    resolve(block);
+                });
+        });
+    }
+
+    /*============================================================================================
+   * getLevelDBDataByHash returns the requested block object using hash as the key for lookup
+   =============================================================================================*/
+
+    getLevelDBDataByAddress(addressValue) {
+        let self = this.db;
+        let block = null;
+        let blockArray = [];
+        console.log("in getLevelDBDataByAddress and this.db is: " + JSON.stringify(this.db));
+        return new Promise(function (resolve, reject) {
+            self.createReadStream()
+                .on('data', function (data) {
+                    console.log("in getLevelDBDataByAddress reading stream JSON.parse(data.value) is: " + JSON.parse(data.value));
+                    console.log("in getLevelDBDataByAddress reading stream data is: " + data);
+                   
+                    if (JSON.parse(data.value).body.address === addressValue) {
+                        console.log("in getLevelDBDataByAddress reading stream JSON.parse(data.value).body.address is: " + JSON.parse(data.value).body.address);
+                        console.log("in getLevelDBDataByAddress passed in addressValue  is: " + addressValue);
+                        block = JSON.parse(data.value);
+                        block.body.star.story = hex2ascii(block.body.star.story);
+                        blockArray.push(block);
+
+                    }
+                })
+                .on('error', function (err) {
+                    reject(err)
+                })
+                .on('close', function () {
+                    console.log("in getLevelDBDataByAddress block sent back is: " + JSON.stringify(block));
+                    resolve(blockArray);
+                });
         });
     }
 

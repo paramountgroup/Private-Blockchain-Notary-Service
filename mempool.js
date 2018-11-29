@@ -104,7 +104,8 @@ class memPool {
     }
 
     verifyAddressRequest(body) {
-        console.log("in verifyAddressRequest this.mempoolValid[0].status.address: " + this.mempoolValid[0].status.address);
+        //getting error here
+        //console.log("in verifyAddressRequest this.mempoolValid[0].status.address: " + this.mempoolValid[0].status.address);
         let index = mempoolUtil.findObjectByKey(this.mempoolValid, "status", "address", body.address);
         console.log(" in verifyAddressRequest index is: " + index);
         console.log(" in verifyAddressRequest this.mempoolValid is: " + JSON.stringify(this.mempoolValid));

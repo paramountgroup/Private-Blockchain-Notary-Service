@@ -3,6 +3,8 @@
 const SHA256 = require('crypto-js/sha256');
 const leveldatabase = require('./level_database_helper.js');
 const block = require('./block.js');
+const StarBlockClass = require('./star_block.js');
+
 
 /**********************************************************************************
  *    Create Blockchain class for retrieving and adding blocks to the blockchain
@@ -20,8 +22,10 @@ class Blockchain {
         const height = await this.getBlockHeight();
         // if a block of -1 is returned there is not a genesis block therefore create one      
         if (height === (-1)) {
+            let genesisBlockText = new Buffer("This is the genesis block it does not contain a star").toString('hex');
+            let genesisStar = new StarBlockClass.StarBlock("", "", "", "", "", genesisBlockText);
             // create genesis block
-            let genesisBlock = new block.Block("First Block - Genesis Block");
+            let genesisBlock = new block.Block(genesisStar);
             // UTC timestamp
             genesisBlock.time = new Date().getTime().toString().slice(0, -3);
             // create a Hash
@@ -84,6 +88,34 @@ class Blockchain {
         try {
             // wait for requested block to resolve promise and then return requested block
             return await this.db.getLevelDBData(blockHeight);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    /************************************************************************************************
+     * @param {any} hash
+     * Return a requested starblock from the blockchain using hash as the key in the database
+     * **********************************************************************************************/
+
+    async getBlockByHash(hash) {
+        try {
+            // wait for requested block to resolve promise and then return requested block
+            return await this.db.getLevelDBDataByHash(hash);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    /************************************************************************************************
+    * @param {any} address
+    * Return a requested starblock from the blockchain using hash as the key in the database
+    * **********************************************************************************************/
+
+    async getBlockByAddress(address) {
+        try {
+            // wait for requested block to resolve promise and then return requested block
+            return await this.db.getLevelDBDataByAddress(address);
         } catch (err) {
             console.log(err);
         }
