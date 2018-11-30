@@ -1,11 +1,11 @@
-# Privat Blockchain Notary Service with Node.js
+# Privat Blockchain Notary Service with Node.js & Expressjs Framework
 
 Udacity Blockchain developer project Private Blockchain Notary Service API with Node.js Framework by Bob Ingram
  
  This project builds a Star Registry Service that allows users to claim ownership 
  of their favorite star in the night sky.
   
-  This program creates a web API using Node.js framework that interacts with my private blockchain
+  This program creates a web API using Node.js and Expressjs framework that interacts with my private blockchain
   and submits and retrieves data using an application like postman or url on localhost port 8000
   
  The boilerplate code for some of this project was taken from the Udacity Web Services with Node.js lesson 2 
@@ -43,7 +43,7 @@ Udacity Blockchain developer project Private Blockchain Notary Service API with 
 
 
 ## Prerequisites  - Node.js
-This API requires node.js, node package manager (npm) & express.js
+This API requires node.js, node package manager (npm) & express.js, dependencies are included in the node folder
 
 ### To install install node.js on your windows machine:
 
@@ -53,64 +53,179 @@ This API requires node.js, node package manager (npm) & express.js
 * Restart your computer
 
 
-The API Creates Two Endpoints per the project rubric
+**The API Creates six Endpoints
 
-**GET Block Endpoint**
-GET request using URL path with a block height parameter. The response for the endpoint provides a block object is JSON format.
+**POST requestValidation Endpoint**
+POST request using URL path http://localhost:8000/requestValidation with data payload option to add 
+electrum wallet address in JSON format.
 
-	URL
-	http://localhost:8000/block/[blockheight]
 
 	Example URL path:
-	http://localhost:8000/block/0, where '0' is the block height.
+	http://localhost:8000/requestValidation body contains JSON object wallet address
+	
+		{
+  	  		"address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL"
+		}
 
 	Response
-	The response for the endpoint provides a block object is JSON format.
+	The response for the endpoint provides a request validaton object with included message is JSON format.
+		{
+    			"walletAddress": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+    			"requestTimeStamp": "1543598821",
+    			"message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry",
+   			 "validationWindow": 300
+		}
 
-	Example GET Response
-	For URL, http://localhost:8000/block/0
+	
+**POST Validate Signature Endpoint**
+Post a validate signature request with data payload option to obtain permission to add a star to the blockchain. 
+The body of the request is a JSON object with wallet address and signature. The response of the request is a JSON
+object with registerStar, address, requesttimeStamp, message, validationWindow, message Signature..
 
-	`{
-					"hash": "7749df61bffc6ca0c7f169fccbb52794ac66d485aa6114792d4b70413ce259a2",
-					"height": 0,
-					"body": "First Block - Genesis Block",
-					"time": "1542737644",
-					"previousBlockHash": ""
-	}`
+	
 
-**POST Block Endpoint**
-Post a new block with data payload option to add data to the block body. The block body supports a string of text. The response for the endpoint provides the block object added the blockchain in JSON format.
-
+	Example URL path for post
+	URL: http://localhost:8000/message-signature/validate body contains JSON object wallet address & Signature
+	
+		{
+			"address":"19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+ 			"signature":"H8K4+1MvyJo9tcr2YN2KejwvX1oqneyCH+fsUL1z1WBdWmswB9bijeFfOfMqK68kQ5RO6ZxhomoXQG3fkLaBl+Q="
+		}
+	
 	Response
-	The response for the endpoint provides a block object in JSON format.
+	The response for the endpoint provides a object in JSON format.
 
-	Example POST response
-	For URL: http://localhost:8000/block/block
+		{
+    			"registerStar": true,
+   			 "status": {
+       				"address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+        			"requestTimeStamp": "1543598824",
+        			"message": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry",
+        			"validationWindow": 297,
+        			"messageSignature": "true"
+    			}
+		}
+		
+**POST Star Registration Endpoint**
+Post a validate store a star request with data payload option to add a star to the blockchain. 
+The body of the request is a JSON object with star properties that include the coordinates and story to encode.
+The response of the request is a JSON object with hash, height, address, star coordinates, star story, time, previousBlockHash.
+
+	
+
+	Example URL path for post
+	URL: http://localhost:8000/block body contains JSON object wallet address, star coordinates, star story
+	
+		{
+			"address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+   			 "star": {
+            			"dec": "68° 52' 56.9",
+            			"ra": "16h 29m 1.0s",
+           			 "story": "Found star using https://www.google.com/sky/"
+        		}
+		}
+	
+	Response
+	The response for the endpoint provides a object in JSON format.
+
+		{
+    			"hash": "dcce672971fb325d092a32812842312978c79ca01ec5d83bdb39577abed14b3e",
+    			"height": 1,
+    			"body": {
+        			"address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+        			"star": {
+            "				ra": "16h 29m 1.0s",
+            				"dec": "68° 52' 56.9",
+            				"story": "Found star using https://www.google.com/sky/"
+       			 }
+    			},
+    			"time": "1543602240",
+    			"previousBlockHash": "2535eea01df2a69a5b5b55ddbecfbd00da716fc30bc63b2470e4748e521d4e6b"
+		}
+
+**GET Star Block by Hash Endpoint**
+GET a star block by hash response returns an entire star block contents with addition of the star story decoded ASCII. The response object includes hash, height, address, star coordinates, time, previousBlock Hash
+
+	Example URL path for GET
+	URL: http://localhost:8000/stars/hash:84cb6ed47a1608a02152f87903359ed283734121b4191bc9eb4813440f80f0b0
+	
+	Response
+	The response for the endpoint provides a object in JSON format.
 
 	{
-	    "hash": "157c14376cacca729dc82edc74ac87dffda527b1d026b3930396df1935c000f6",
-	    "height": 1,
-	    "body": "block",
-	    "time": "1542737794",
-	    "previousBlockHash": "7749df61bffc6ca0c7f169fccbb52794ac66d485aa6114792d4b70413ce259a2"
+    		"hash": "84cb6ed47a1608a02152f87903359ed283734121b4191bc9eb4813440f80f0b0",
+    		"height": 1,
+    		"body": {
+        		"address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+        		"star": {
+            			"ra": "16h 29m 1.0s",
+            			"dec": "68° 52' 56.9",
+            			"story": "466f756e642073746172207573696e672068747470733a2f2f7777772e676f6f676c652e636f6d2f736b792f"
+        	}
+    		},
+    		"time": "1543523723",
+    		"previousBlockHash": "21f14ac5e566027890e6eddc26c2e2405c73b5db694bb96bd4657db9f9420323"
 	}
+		
+**GET Star Block by Wallet Address Endpoint**
+GET a star block by wallet address response returns an entire star block contents with addition of the star story decoded ASCII. The response object includes hash, height, address, star coordinates, time, previousBlock Hash
 
+	Example URL path for GET
+	URL: http://localhost:8000/stars/address:19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL
+	
+		
+	Response
+	The response for the endpoint provides a object in JSON format.
 
+	{
+        	"hash": "84cb6ed47a1608a02152f87903359ed283734121b4191bc9eb4813440f80f0b0",
+        	"height": 1,
+        	"body": {
+            	"address": "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL",
+            	"star": {
+                	"ra": "16h 29m 1.0s",
+                	"dec": "68° 52' 56.9",
+                	"story": "Found star using https://www.google.com/sky/"
+            	}
+        	},
+        	"time": "1543523723",
+        	"previousBlockHash": "21f14ac5e566027890e6eddc26c2e2405c73b5db694bb96bd4657db9f9420323"
+    	}
+	
+**GET Star Block by Block Height Endpoint**
+GET a star block by block height response returns an entire star block contents with addition of the star story decoded ASCII. The response object includes hash, height, address, star coordinates, time, previousBlock Hash
+
+	Example URL path for GET
+	URL: http://localhost:8000/block/0
+	
+		
+	Response
+	The response for the endpoint provides a object in JSON format.
+
+	{
+    		"hash": "19dd980fffbc054b53ee883fc4e2a230f3a9f6127fbc2d5b961c2e33c14ee6b0",
+    		"height": 0,
+    		"body": {
+        		"address": "",
+        		"star": {
+            			"ra": "",
+            			"dec": "",
+            			"mag": "",
+            			"cen": "",
+            			"story": "This is the genesis block it does not contain a star"
+        		}
+    		},
+    		"time": "1543587602",
+    		"previousBlockHash": ""
+	}
+	
 End with an example of getting some data out of the system or using it for a little demo
 
-Running the tests
-Explain how to run the automated tests for this system
+*Running the tests
+Tools like postman make testing a simple matter. You can set up fail scenarios such as bad 
+signature, star story too many words or too many bytes, and normal testing for the endpoints. Just save these 
+endpoint requests in a collection to speed testing time.
 
-Break down into end to end tests
-Explain what these tests test and why
-
-Give an example
-And coding style tests
-Explain what these tests test and why
-
-Give an example
-Deployment
-Add additional notes about how to deploy this on a live system
 
 ## Built With
 Express.js - Express is a minimal and flexible Node.js web application framework.
@@ -125,5 +240,5 @@ Bob Ingram - Boilerplate code provided by Udacity Blockchain developer course
 This project is licensed under the MIT License - see the LICENSE.md file for details
 
 ## Acknowledgments
-Thanks to **Programming with Mosh** for the excellent expressjs tutorial on youtube.
-https://www.youtube.com/watch?v=pKd0Rpw7O48&t=1954s
+udacity Blockchain developer course, expressjs, stackoverflow
+
