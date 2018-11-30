@@ -219,7 +219,8 @@ GET a star block by block height response returns an entire star block contents 
     		"previousBlockHash": ""
 	}
 	
-End with an example of getting some data out of the system or using it for a little demo
+![postman example](https://github.com/paramountgroup/Private-Blockchain-Notary-Service/blob/master/images/postmanexample.PNG)
+
 
 *Running the tests
 Tools like postman make testing a simple matter. You can set up fail scenarios such as bad 
