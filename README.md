@@ -219,7 +219,11 @@ GET a star block by block height response returns an entire star block contents 
     		"previousBlockHash": ""
 	}
 	
+**Sample Screen using Postman to test API endpoints
+
+
 ![postman example](https://github.com/paramountgroup/Private-Blockchain-Notary-Service/blob/master/images/postmanexample.PNG)
+
 
 
 *Running the tests
