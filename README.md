@@ -1,4 +1,4 @@
-# Privat Blockchain Notary Service with Node.js & Expressjs Framework
+# Privat Blockchain Notary Service with Node.js
 
 Udacity Blockchain developer project Private Blockchain Notary Service API with Node.js Framework by Bob Ingram
  
