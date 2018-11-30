@@ -1,11 +1,36 @@
-# RESTful-API-wth-Node.js
+# Privat Blockchain Notary Service with Node.js
 
-Udacity Blockchain developer project RESTful Web API with Node.js Framework by Bob Ingram
+Udacity Blockchain developer project Private Blockchain Notary Service API with Node.js Framework by Bob Ingram
  
- * This program creates a web API using Node.js framework that interacts with my private blockchain
- * Submits and retrieves data using an application like postman or url on localhost port 8000 http://localhost:8000/api/block/
- * The boilerplate code for this project was taken from the Udacity Web Services with Node.js lesson 2 
-  practice express.js exercise and incorporates private blockchain from project 2.
+ This project builds a Star Registry Service that allows users to claim ownership 
+ of their favorite star in the night sky.
+  
+  This program creates a web API using Node.js framework that interacts with my private blockchain
+  and submits and retrieves data using an application like postman or url on localhost port 8000
+  
+ The boilerplate code for some of this project was taken from the Udacity Web Services with Node.js lesson 2 
+  practise express.js exercise and the project instruction notes
+  
+     The Notary Service creates a Blockchain dataset that allow you to store a Star 
+ 
+       * The application persists the data (using LevelDB).
+       * The application allows users to identify the Star data with the owner.
+       
+      The Mempool component
+ 
+       * The mempool component stores temporal validation requests for 5 minutes (300 seconds).
+       * The mempool component stores temporal valid requests for 30 minutes (1800 seconds).
+       * The mempool component manages the validation time window.
+        
+      The REST API that allows users to interact with the application.
+ 
+       * The API allow users to submit a validation request.
+       * The API allow users to validate the request.
+       * The API encodes and decodes the star data.
+       * The API allows users to submit the Star data.
+       * The API allows lookup of Stars by hash, wallet address, and height.
+ 
+ 
 
 ## Getting Started - Steps to Follow
 
