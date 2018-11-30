@@ -8,6 +8,7 @@
 
 class MempoolValidObject {
     constructor(walletAddress) {
+        this.timeout = ""
         this.registerStar = true;
         this.status = {
             address: walletAddress,

@@ -1,8 +1,8 @@
 // JavaScript source code level_database_helper.js
 
-const level = require('level');
-const hex2ascii = require('hex2ascii');
-const chaindb = './chaindata';
+const Level = require('level');
+const Hex2Ascii = require('hex2ascii');
+const ChainDB = './chaindata';
 
 /***********************************************************************************************
  * create LevelDatabase class for storing and retrieving blockchain data in LevelDB
@@ -11,7 +11,7 @@ const chaindb = './chaindata';
 class LevelDatabase {
     // create the LevelDB persistent database for storing blockchain
     constructor() {
-        this.db = level(chaindb);
+        this.db = Level(ChainDB);
     }
 
     /*============================================================================================
@@ -79,7 +79,7 @@ class LevelDatabase {
                         // a star block was found matching the requested wallet address
                         block = JSON.parse(data.value);
                         //convert the star story back into ascii before adding block to the array
-                        block.body.star.story = hex2ascii(block.body.star.story);
+                        block.body.star.story = Hex2Ascii(block.body.star.story);
                         blockArray.push(block);
                     }
                 })

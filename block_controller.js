@@ -4,9 +4,7 @@ const BlockClass = require('./block.js');
 const StarBlockClass = require('./star_block.js');
 const BlockChain = require('./blockchain.js');
 const MemPool = require('./mempool.js');
-const hex2ascii = require('hex2ascii');
-//const bitcoin = require('bitcoinjs-lib');
-//const bitcoinMessage = require('bitcoinjs-message');
+const Hex2Ascii = require('hex2ascii');
 const WordCount = require('wordcount');
 const ByteCount = require('bytes-counter');
 
@@ -78,13 +76,12 @@ class BlockController {
     }
 
     /*************************************************************************************
-     * Implement a GET Endpoint to retrieve a block by index, url: "/block/:height"
+     *  GET Endpoint to retrieve a block by index (block height), url: "/block/:height"
      *************************************************************************************/
 
     getStarBlockByHeight() {
         this.app.get("/block/:height", (req, res) => {
             let genesisText = new Buffer("This is the genesis block it does not have a star").toString('hex');
-            console.log("in getStarBlockByHeight and hex text is: " + genesisText);
             // Listen for height param and convert to integer if necessary
             let height = parseInt(req.params.height, 10);
             // start error checking if ok send back requested block in json format
@@ -98,7 +95,7 @@ class BlockController {
                     // return requested block
                     this.blockChain.getBlock(height).then((block) => {
                         if (block) { //  requested block retrieved send back in json with 200 status
-                            block.body.star.story = hex2ascii(block.body.star.story);
+                            block.body.star.story = Hex2Ascii(block.body.star.story);
                             return res.status(200).json(block);
                         } else {
                             return res.status(500).send("Block Not Found Unknown Reason");
@@ -132,15 +129,15 @@ class BlockController {
                 };
                 // verify there is valid request with confirmed signature
                 let validAddressRequestArray = this.memPool.verifyAddressRequest(req.body)
+                // verifyAddressRequest verified there was a valid request in mempoolValid[] and the star data is present
                 if (validAddressRequestArray[2]) {
-                    console.log("in postNewStar and req.body.star.story is: " + req.body.star.story);
                     let starStoryHexEncode = new Buffer(req.body.star.story).toString('hex');
                     let star = new StarBlockClass.StarBlock(req.body.address, req.body.star.ra, req.body.star.dec, req.body.star.mag, req.body.star.cen, starStoryHexEncode);
                     let newBlock = new BlockClass.Block(star);
                     // add block and check for errors
                     this.blockChain.addBlock(newBlock).then((addedBlock) => {
                         if (addedBlock) {// success return block that was added
-                            addedBlock.body.star.story = hex2ascii(addedBlock.body.star.story);
+                            addedBlock.body.star.story = Hex2Ascii(addedBlock.body.star.story);
                             return res.status(201).json(addedBlock);
                         } else {
                             return res.status(500).send("Something went wrong star block was NOT added");
@@ -172,7 +169,6 @@ class BlockController {
                     //requested starblock returned                     
                     return res.status(200).json(starBlock);
                 } else { return res.status(404).send("Star Block not found with hash: " + req.params.hash); }
-
                 //catch error if something went wrong with promises
             }).catch((error) => { return res.status(500).send("Something went wrong! " + error); })
         })
@@ -191,10 +187,8 @@ class BlockController {
             this.blockChain.getBlockByAddress(req.params.address).then((starBlockArray) => {
                 if (starBlockArray) {
                     //requested starblock returned                     
-
                     return res.status(200).json(starBlockArray);
                 } else { return res.status(404).send("Star Block not found with address: " + req.params.address); }
-
                 //catch error if something went wrong with promises
             }).catch((error) => { return res.status(500).send("Something went wrong! " + error); })
         })
