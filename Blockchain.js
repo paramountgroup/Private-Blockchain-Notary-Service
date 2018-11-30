@@ -1,8 +1,8 @@
 // JavaScript source code blockchain.js used to create Blockchain class
 
 const SHA256 = require('crypto-js/sha256');
-const leveldatabase = require('./level_database_helper.js');
-const block = require('./block.js');
+const LevelDatabase = require('./level_database_helper.js');
+const Block = require('./block.js');
 const StarBlockClass = require('./star_block.js');
 
 
@@ -13,7 +13,7 @@ const StarBlockClass = require('./star_block.js');
 class Blockchain {
     constructor() {
         //verify Genesis block and create if necessary
-        this.db = new leveldatabase.LevelDatabase();
+        this.db = new LevelDatabase.LevelDatabase();
         this.verifyGenesisBlock();
     }
 
@@ -22,10 +22,12 @@ class Blockchain {
         const height = await this.getBlockHeight();
         // if a block of -1 is returned there is not a genesis block therefore create one      
         if (height === (-1)) {
+            // Star story text saved in hex format
             let genesisBlockText = new Buffer("This is the genesis block it does not contain a star").toString('hex');
+            // modify simple blockchain to incorporate star data
             let genesisStar = new StarBlockClass.StarBlock("", "", "", "", "", genesisBlockText);
             // create genesis block
-            let genesisBlock = new block.Block(genesisStar);
+            let genesisBlock = new Block.Block(genesisStar);
             // UTC timestamp
             genesisBlock.time = new Date().getTime().toString().slice(0, -3);
             // create a Hash
@@ -39,7 +41,7 @@ class Blockchain {
      * @param {any} newBlock
      *   Add new block to blockchain
     *********************************************************************************/
-   
+
     async addBlock(newBlock) {
         // get blockchain height
         let prevBlockHeight = await this.getBlockHeight();
@@ -95,7 +97,7 @@ class Blockchain {
 
     /************************************************************************************************
      * @param {any} hash
-     * Return a requested starblock from the blockchain using hash as the key in the database
+     * Return a requested starblock from the blockchain using hash to find block in the database
      * **********************************************************************************************/
 
     async getBlockByHash(hash) {
@@ -109,7 +111,7 @@ class Blockchain {
 
     /************************************************************************************************
     * @param {any} address
-    * Return a requested starblock from the blockchain using hash as the key in the database
+    * Return a requested block from the blockchain using wallet address to find blocks in the database
     * **********************************************************************************************/
 
     async getBlockByAddress(address) {

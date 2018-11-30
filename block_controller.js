@@ -5,15 +5,10 @@ const StarBlockClass = require('./star_block.js');
 const BlockChain = require('./blockchain.js');
 const MemPool = require('./mempool.js');
 const hex2ascii = require('hex2ascii');
-const bitcoin = require('bitcoinjs-lib');
-const bitcoinMessage = require('bitcoinjs-message');
+//const bitcoin = require('bitcoinjs-lib');
+//const bitcoinMessage = require('bitcoinjs-message');
 const WordCount = require('wordcount');
 const ByteCount = require('bytes-counter');
-
-let address = '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ'
-let signature = 'IJtpSFiOJrw/xYeucFxsHvIRFJ85YSGP8S1AEZxM4/obS3xr9iz7H0ffD7aM2vugrRaCi/zxaPtkflNzt5ykbc0='
-let message = '142BDCeSGbXjWKaAnYXbMpZ6sbrSAo3DpZ:1532330740:starRegistry'
-
 
 
 /********************************************************************
@@ -41,21 +36,23 @@ class BlockController {
     }
 
     /*************************************************************************************
-     * Implement a GET Endpoint to retrieve a block by index, url: "/api/block/:index"
+     * Web API post endpoint validates request with JSON response. The validation response
+     * contains the message details, timestamp and time remaining for validation window
+     * Validation windwo is set to 5 minutes. When resubmitting request the validation
+     * window will reduce until it expires
      *************************************************************************************/
 
     requestValidation() {
-        console.log("in requestValidation ");
         this.app.post("/requestValidation", (req, res) => {
-            console.log("in requestValidation ");
-            // Listen for height param and convert to integer if necessary
-            console.log("in requestValidation req.body is: " + JSON.stringify(req.body));
+            // Listen for request Validation with wallet address as part of the request body          
             if (req.body.address) {
                 let returnValidationObject = this.memPool.addARequestValidation(req.body)
+                // remove the timeout function from the mempool return object 
                 delete returnValidationObject.timeout;
+                // send ok status and proper validation object
                 return res.status(200).json(returnValidationObject);
             } else {
-                return res.status(404).send("no address to validate");
+                return res.status(400).send("No address to validate");
             }
         })
     }
@@ -68,14 +65,11 @@ class BlockController {
 
 
     validateSignature() {
-        console.log("in requestToValidate ");
         this.app.post("/message-signature/validate", (req, res) => {
-            // console.log("in requestToValidate ");
-
-            console.log("in requestToValidate req.body is: " + JSON.stringify(req.body));
+            // check if required wallet address and signature included in the request validate signature
             if (req.body.address && req.body.signature) {
+                // returned array validRequestArray contain both valid or invalid response
                 let validRequestArray = this.memPool.validateRequestByWallet(req.body)
-
                 return res.status(validRequestArray[0]).json(validRequestArray[1]);
             } else {
                 return res.status(404).send("Missing address or signature to validate");
@@ -115,27 +109,28 @@ class BlockController {
         })
     }
 
-    /**********************************************************************
-    * Implement a POST Endpoint to add a new Block, url: "/block"
-    ***********************************************************************/
+    /**************************************************************************************************
+    * Web API Post Endpoint with JSON response. Star Object and properties are stored within the 
+    * body of the block. Star properties include the coordinates with hex encoded story. Star story
+    * supports ASCII text, limited to 250 words, 500 bytes and is hex encoded
+    ***************************************************************************************************/
 
 
     postNewStar() {
         this.app.post("/block", (req, res) => {
-            // retrieve data and create new block
-
-
+            // retrieve POST endpoint data and create new block
             if (req.body) {
-                let asciitext = /^[\x00-\x7F]*$/.test(req.body.star.story)
-                console.log("in postNewStar checking ascii text: " + asciitext);
+                // check star story to ensure submitted as ascii text
                 if (/^[\x00-\x7F]*$/.test(req.body.star.story) != true) {
                     return res.status(400).send("Star story must be ascii test");
+                // max word count for star story is 250 words
                 } else if (WordCount(req.body.star.story) > 250) {
                     return res.status(400).send("Star story can not exceed 250 words");
+                // max number of bytes for star is story is 500 bytes
                 } else if (ByteCount.count(req.body.star.story) > 500) {
                     return res.status(400).send("Star story can not exceed 500 bytes");
                 };
-                console.log("in postNewStar starting verifyAddressRequest");
+                // verify there is valid request with confirmed signature
                 let validAddressRequestArray = this.memPool.verifyAddressRequest(req.body)
                 if (validAddressRequestArray[2]) {
                     console.log("in postNewStar and req.body.star.story is: " + req.body.star.story);

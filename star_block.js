@@ -2,7 +2,7 @@
 
 
 /******************************************************************
-*  Class with a constructor for star 			   
+*  Class StarBlock with a constructor for star data 			   
 *******************************************************************/
 
 class StarBlock {

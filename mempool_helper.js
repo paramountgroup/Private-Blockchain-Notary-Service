@@ -3,31 +3,38 @@
 
 module.exports = {
 
-    findObjectByKey(array, key1, key2, value) {
-        console.log("in findObjectByKey array is: " + array);
-        console.log("in findObjectByKey value is: " + value);
+    /*****************************************************************************************
+    *  findObjectByKey is will find an object by key in an array and return the array position		   
+    ******************************************************************************************/
+
+    findObjectByKey(array, key, value) {
+        //cycle through the array and find index position that matches the given passed value
+        console.log("in findObjectByKey and array is: " + array);
+       // console.log("in findObjectByKey JSON.stringify(array.status) is: " + JSON.stringify(array.status));
+        console.log("in findObjectByKey and key is: " + key);
+      
+        console.log("in findObjectByKey and value is: " + value);
+       // console.log("in findObjectByKey and array[0].walletAddress is: " + array[0].walletAddress);
         for (var i = 0; i < array.length; i++) {
-            console.log("in findObjectByKey for loop and i is: " + i);
-            console.log("in findObjectByKey key1 is: " + key1 + "key2 is: " + key2 + "value is: " + value);
-            //console.log("in findObjectByKey array[i].status.address is: " + array[i].status.address);
-            console.log("in findObjectByKey array[i][key] is: " + array[i][key1][key2] + " i is: " + i);
-            if (array[i][key1][key2] === value) {
-                console.log("in findObjectByKey returning array position i: " + i);
-               // console.log(" in findObjectByKey array[i].key is: " + array[i].key);
-                console.log(" in findObjectByKey value is: " + value);
-                return i;
-            }
+            console.log("in findObjectByKey and array[i].status[key] is: " + array[i].status[key]);           
+                if (array[i].status[key] === value) {
+                    return i;
+                }
         }
-        //did not find the requested address the mempool - return null
+        console.log("in findObjectByKey returning null");
+        //did not find the requested value the mempool - return null
         return null;
     },
 
+    /*****************************************************************************************
+    *  findTimeLeftInMempool checks how long an object has been in the mempool array and returns 
+    *  time left - In this case it is 5 minute countdown
+    ******************************************************************************************/
+
     findTimeLeftInMempool(mempoolRequestedObject, TimeoutRequestsWindowTime) {
-      //  console.log("in addARequestValidation for loop checking if request exists i is: " + i);
-        let timeElapse = (new Date().getTime().toString().slice(0, -3)) - mempoolRequestedObject.requestTimeStamp;
-        console.log("in addARequestValidation timeElase is: " + timeElapse);
+        let timeElapse = (new Date().getTime().toString().slice(0, -3)) - mempoolRequestedObject.status.requestTimeStamp;
+        // subtract time elapsed from 5 minutes and return time left
         let timeLeft = (TimeoutRequestsWindowTime / 1000) - timeElapse;
-        console.log("in addARequestValidation timeLeft is: " + timeLeft);
         return timeLeft;
     }
 }

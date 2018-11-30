@@ -2,7 +2,6 @@
 
 const level = require('level');
 const hex2ascii = require('hex2ascii');
-
 const chaindb = './chaindata';
 
 /***********************************************************************************************
@@ -34,23 +33,22 @@ class LevelDatabase {
 
 
     /*============================================================================================
-    * getLevelDBDataByHash returns the requested block object using hash as the key for lookup
+    * getLevelDBDataByHash returns the requested block object using hash as the value for lookup
+    * hash values are unique therefore only one block returned
     =============================================================================================*/
-    
+
     getLevelDBDataByHash(hashValue) {
         let self = this.db;
         let block = null;
-        console.log("in getLevelDBDataByHash passed in hash is: " + hashValue);
-        console.log("in getLevelDBByHash and this.db is: " + JSON.stringify(this.db));
+        // set promise while searching level database for the given hash value
         return new Promise(function (resolve, reject) {
             self.createReadStream()
                 .on('data', function (data) {
-                    console.log("in getLevelDBDataByHash reading stream JSON.parse(data.value).hash is: " + JSON.parse(data.value).hash);
-                    console.log("in getLevelDBDataByHash reading stream data is: " + data);
-                    console.log("in getLevelDBDataByHash reading stream JSON.stringify(data) is: " + JSON.stringify(data));
+                    /* the blockchain is stored as key value pairs. In this case the key (block height) is not helpful so we search 
+                    *  all the values (aka blocks) to find the one with the give hash*/
                     if (JSON.parse(data.value).hash === hashValue) {
+                        //found the block and parsed back into a block object
                         block = JSON.parse(data.value);
-                        
                     }
                 })
                 .on('error', function (err) {
@@ -62,35 +60,33 @@ class LevelDatabase {
         });
     }
 
-    /*============================================================================================
-   * getLevelDBDataByHash returns the requested block object using hash as the key for lookup
-   =============================================================================================*/
+    /*==========================================================================================================
+    * getLevelDBDataByAddress returns the requested block object using wallet address as the value for lookup
+    * It is possible to have multiple stars registered to one wallet address. Star blocks are returned in an array
+    ===========================================================================================================*/
 
     getLevelDBDataByAddress(addressValue) {
         let self = this.db;
         let block = null;
         let blockArray = [];
-        console.log("in getLevelDBDataByAddress and this.db is: " + JSON.stringify(this.db));
+        // set new promise to return requested blocks when completed searching the database
         return new Promise(function (resolve, reject) {
             self.createReadStream()
                 .on('data', function (data) {
-                    console.log("in getLevelDBDataByAddress reading stream JSON.parse(data.value) is: " + JSON.parse(data.value));
-                    console.log("in getLevelDBDataByAddress reading stream data is: " + data);
-                   
+                    /* the blockchain is stored as key value pairs. In this case the key (block height) is not helpful so we search 
+                   *  all the values (aka blocks) to find the one with the give wallet address*/
                     if (JSON.parse(data.value).body.address === addressValue) {
-                        console.log("in getLevelDBDataByAddress reading stream JSON.parse(data.value).body.address is: " + JSON.parse(data.value).body.address);
-                        console.log("in getLevelDBDataByAddress passed in addressValue  is: " + addressValue);
+                        // a star block was found matching the requested wallet address
                         block = JSON.parse(data.value);
+                        //convert the star story back into ascii before adding block to the array
                         block.body.star.story = hex2ascii(block.body.star.story);
                         blockArray.push(block);
-
                     }
                 })
                 .on('error', function (err) {
                     reject(err)
                 })
                 .on('close', function () {
-                    console.log("in getLevelDBDataByAddress block sent back is: " + JSON.stringify(block));
                     resolve(blockArray);
                 });
         });
@@ -110,7 +106,7 @@ class LevelDatabase {
                 i++;
             }).on('error', function (err) {
                 reject(err);
-                }).on('close', function () {
+            }).on('close', function () {
                 // save key value pair in blockchain database this.db
                 self.put(i, JSON.stringify(block), function (err) {
                     if (err) return console.log('Block ' + key + ' submission failed', err);

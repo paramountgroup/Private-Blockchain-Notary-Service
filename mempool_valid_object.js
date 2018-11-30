@@ -2,9 +2,9 @@
 
 
 
-/******************************************************************
-*  Class with a constructor for MempoolValidObject			   
-*******************************************************************/
+/****************************************************************************
+*  Class MempoolValidObject with a constructor for Mempool Valid Object			   
+*****************************************************************************/
 
 class MempoolValidObject {
     constructor(walletAddress) {
@@ -14,7 +14,7 @@ class MempoolValidObject {
             requestTimeStamp: (new Date().getTime().toString().slice(0, -3)),
             message: "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry",
             validationWindow: "",
-            messageSignature: "valid"
+            messageSignature: "true"
         };
     }
 }
