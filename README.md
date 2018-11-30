@@ -38,7 +38,7 @@ Udacity Blockchain developer project Private Blockchain Notary Service API with 
 2. Open the terminal in the directory you downloaded the repository and install npm: `npm install`.
 3. Install express.js: npm install express --save
 4. Run your application `node app.js`
-5. Test your Endpoints with Curl or Postman.  http://localhost:8000/api/block/
+5. Test your Endpoints with Curl or Postman.  http://localhost:8000/block/
 
 
 
