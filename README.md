@@ -35,10 +35,10 @@ Udacity Blockchain developer project Private Blockchain Notary Service API with 
 ## Getting Started - Steps to Follow
 
 1. Clone the repository to your local computer.
-2. Open the terminal in the directory you downloaded the repository and install npm: `npm install`.
+2. Open the terminal in the directory you downloaded the repository and install npm: `npm init`.
 3. Install express.js: npm install express --save
 4. Run your application `node app.js`
-5. Test your Endpoints with Curl or Postman.  http://localhost:8000/api/block/
+5. Test your Endpoints with Curl or Postman.  http://localhost:8000/block/
 
 
 
@@ -219,7 +219,12 @@ GET a star block by block height response returns an entire star block contents 
     		"previousBlockHash": ""
 	}
 	
-End with an example of getting some data out of the system or using it for a little demo
+**Sample Screen using Postman to test API endpoints
+
+
+![postman example](https://github.com/paramountgroup/Private-Blockchain-Notary-Service/blob/master/images/postmanexample.PNG)
+
+
 
 *Running the tests
 Tools like postman make testing a simple matter. You can set up fail scenarios such as bad 
