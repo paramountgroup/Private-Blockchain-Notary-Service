@@ -5,7 +5,6 @@ const StarBlockClass = require('./star_block.js');
 const BlockChain = require('./blockchain.js');
 const MemPool = require('./mempool.js');
 const Hex2Ascii = require('hex2ascii');
-const WordCount = require('wordcount');
 const ByteCount = require('bytes-counter');
 
 
@@ -95,7 +94,8 @@ class BlockController {
                     // return requested block
                     this.blockChain.getBlock(height).then((block) => {
                         if (block) { //  requested block retrieved send back in json with 200 status
-                            block.body.star.story = Hex2Ascii(block.body.star.story);
+                            //decode star story back to ASCII before returning response
+                            block.body.star.storyDecoded = Hex2Ascii(block.body.star.story);
                             return res.status(200).json(block);
                         } else {
                             return res.status(500).send("Block Not Found Unknown Reason");
@@ -119,25 +119,24 @@ class BlockController {
             if (req.body) {
                 // check star story to ensure submitted as ascii text
                 if (/^[\x00-\x7F]*$/.test(req.body.star.story) != true) {
-                    return res.status(400).send("Star story must be ascii test");
-                // max word count for star story is 250 words
-                } else if (WordCount(req.body.star.story) > 250) {
-                    return res.status(400).send("Star story can not exceed 250 words");
+                    return res.status(400).send("Star story must be ascii text");
                 // max number of bytes for star is story is 500 bytes
                 } else if (ByteCount.count(req.body.star.story) > 500) {
-                    return res.status(400).send("Star story can not exceed 500 bytes");
+                    return res.status(400).send("Star story can not exceed 250 words:500 bytes");
                 };
                 // verify there is valid request with confirmed signature
                 let validAddressRequestArray = this.memPool.verifyAddressRequest(req.body)
                 // verifyAddressRequest verified there was a valid request in mempoolValid[] and the star data is present
                 if (validAddressRequestArray[2]) {
+                    //encode star story hex prior to adding to the blockchain
                     let starStoryHexEncode = new Buffer(req.body.star.story).toString('hex');
                     let star = new StarBlockClass.StarBlock(req.body.address, req.body.star.ra, req.body.star.dec, req.body.star.mag, req.body.star.cen, starStoryHexEncode);
                     let newBlock = new BlockClass.Block(star);
                     // add block and check for errors
                     this.blockChain.addBlock(newBlock).then((addedBlock) => {
                         if (addedBlock) {// success return block that was added
-                            addedBlock.body.star.story = Hex2Ascii(addedBlock.body.star.story);
+                            //decode star story to ASCII prior to return to user
+                            addedBlock.body.star.storyDecoded = Hex2Ascii(addedBlock.body.star.story);
                             return res.status(201).json(addedBlock);
                         } else {
                             return res.status(500).send("Something went wrong star block was NOT added");
@@ -162,7 +161,6 @@ class BlockController {
         this.app.get("/stars/hash::hash", (req, res) => {
             // Listen for hash param and convert to integer if necessary
             if (req.params.hash);
-            console.log(" in getStarBlockByHash req.params.hash is: " + req.params.hash);
             // start error checking if ok send back requested block in json format
             this.blockChain.getBlockByHash(req.params.hash).then((starBlock) => {
                 if (starBlock) {

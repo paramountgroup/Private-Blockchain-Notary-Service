@@ -11,7 +11,7 @@ class requestObject {
         this.status = {
             walletAddress: address,
             requestTimeStamp: (new Date().getTime().toString().slice(0, -3)),
-            message: "19xaiMqayaNrn3x7AjV5cU4Mk5f5prRVpL:1541605128:starRegistry",
+            message: "TODO add message",
             validationWindow: 300,
         };
     }

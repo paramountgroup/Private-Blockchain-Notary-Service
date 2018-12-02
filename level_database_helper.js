@@ -49,6 +49,8 @@ class LevelDatabase {
                     if (JSON.parse(data.value).hash === hashValue) {
                         //found the block and parsed back into a block object
                         block = JSON.parse(data.value);
+                        //decoded star story back to ASCII prior to return to the user
+                        block.body.star.storyDecoded = Hex2Ascii(block.body.star.story)                     
                     }
                 })
                 .on('error', function (err) {
@@ -79,7 +81,7 @@ class LevelDatabase {
                         // a star block was found matching the requested wallet address
                         block = JSON.parse(data.value);
                         //convert the star story back into ascii before adding block to the array
-                        block.body.star.story = Hex2Ascii(block.body.star.story);
+                        block.body.star.storyDecoded = Hex2Ascii(block.body.star.story);
                         blockArray.push(block);
                     }
                 })

@@ -28,17 +28,16 @@ class memPool {
         for (var i = 0; i <= this.mempool.length - 1; i++) {
             // check if request exists in mempool < 5 minutes old
             if (this.mempool[i].status.walletAddress === validationRequest.address) {
-
-                let timeElapse = (new Date().getTime().toString().slice(0, -3)) - this.mempool[i].status.requestTimeStamp;
-                let timeLeft = (MempoolTimeoutRequestsWindowTime / 1000) - timeElapse;
-                // timeLeft is the countdown timer for 5 minute request window
-                this.mempool[i].status.validationWindow = timeLeft;
+                // use mempoolUtil function to find time left in the validation window (5 minutes)
+                this.mempool[i].status.validationWindow = MempoolUtil.findTimeLeftInMempool(this.mempool[i], MempoolTimeoutRequestsWindowTime);
                 // return the undated validation request with a new time left
                 return this.mempool[i].status;
             }
         }
         // Request not found in the mempool create a new validationRequestObject & return object
         let validationRequestObject = new RequestObjectClass.requestObject(validationRequest.address);
+        //add message to the validationRequestObject in this format [walletAddress]:[timeStamp]:starRegistry
+        validationRequestObject.status.message = (validationRequestObject.status.walletAddress + ":" + validationRequestObject.status.requestTimeStamp + ":starRegistry");
         MempoolUtil.addToMemPool(this.mempool, validationRequestObject, MempoolTimeoutRequestsWindowTime);
         return validationRequestObject.status;
     }
@@ -61,6 +60,8 @@ class memPool {
                 let mempoolValidRequestObject = new MempoolValidObjectClass.MempoolValidObject(validateRequest.address);
                 //find the time left in the mempool 5 minute countdown and add to the validate request object
                 mempoolValidRequestObject.status.validationWindow = MempoolUtil.findTimeLeftInMempool(this.mempool[index], MempoolTimeoutRequestsWindowTime);
+                //add the message to new valid request object
+                mempoolValidRequestObject.status.message = this.mempool[index].status.message;
                // this request is valid and it being moved the mempoolValid array and removed from the mempool array
                 MempoolUtil.removeValidationRequest(this.mempool, "walletAddress", validateRequest.address);
                 MempoolUtil.addToMemPool(this.mempoolValid, mempoolValidRequestObject, MempoolValidTimeoutRequestsWindowTime);

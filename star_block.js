@@ -13,7 +13,8 @@ class StarBlock {
             dec: DEC,
             mag: MAG,
             cen: CEN,
-            story: starStory
+            story: starStory,
+            storyDecoded: ""
         }
     };
 }
