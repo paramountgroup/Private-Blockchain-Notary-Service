@@ -53,7 +53,7 @@ This API requires node.js, node package manager (npm) & express.js, dependencies
 * Restart your computer
 
 
-**The API Creates six Endpoints
+**The API Creates six Endpoints**
 
 **POST requestValidation Endpoint**
 POST request using URL path http://localhost:8000/requestValidation with data payload option to add 
