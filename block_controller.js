@@ -180,11 +180,11 @@ class BlockController {
         this.app.get("/stars/address::address", (req, res) => {
             // Listen for hash param and convert to integer if necessary
             if (req.params.address);
-            console.log(" in getStarBlockByHash req.params.hash is: " + req.params.address);
             // start error checking if ok send back requested block in json format
             this.blockChain.getBlockByAddress(req.params.address).then((starBlockArray) => {
-                if (starBlockArray) {
-                    //requested starblock returned                     
+                // if there were star blocks found they will be in the array else nothing was found
+                if (starBlockArray.length != 0) {
+                    //requested starblock(s) returned                     
                     return res.status(200).json(starBlockArray);
                 } else { return res.status(404).send("Star Block not found with address: " + req.params.address); }
                 //catch error if something went wrong with promises
